@@ -2,6 +2,7 @@ import numpy as np
 import math
 from numpy import linalg as LA
 
+
 def compute_Z(X, centering=True, scaling=False):
     X_copy = np.copy(X.astype(float))
     sampleSize = np.size(X_copy, 0)
@@ -9,27 +10,28 @@ def compute_Z(X, centering=True, scaling=False):
     if(centering):
         for i in range(featureSize):
             mean = np.mean(X_copy[:, i])
-            print(mean)
             for j in range(sampleSize):
                 X_copy[j][i] = X_copy[j][i] - mean
     if(scaling):
         for i in range(featureSize):
             std = np.std(X_copy[:, i])
-            print(std)
             for j in range(sampleSize):
                 X_copy[j][i] = X_copy[j][i] / std
     return X_copy
 
+
 def compute_covariance_matrix(Z):
     return np.matmul(np.transpose(Z), Z)
 
+
 def find_pcs(COV):
     eigenValues, eigenVectors = LA.eig(COV)
-    idx = eigenValues.argsort()[::-1]   
+    idx = eigenValues.argsort()[::-1]
     eigenValues = eigenValues[idx]
-    eigenVectors = eigenVectors[:,idx]
+    eigenVectors = eigenVectors[:, idx]
 
     return eigenValues, eigenVectors
+
 
 def project_data(Z, PCS, L, k, var):
     necc_EVs = k
