@@ -8,15 +8,15 @@ def compute_Z(X, centering=True, scaling=False):
     sampleSize = np.size(X_copy, 0)
     featureSize = np.size(X_copy, 1)
     if(centering):
-        for i in range(featureSize):
-            mean = np.mean(X_copy[:, i])
-            for j in range(sampleSize):
-                X_copy[j][i] = X_copy[j][i] - mean
+        for col in range(featureSize):
+            mean = np.mean(X_copy[:, col])
+            for row in range(sampleSize):
+                X_copy[row][col] = X_copy[row][col] - mean
     if(scaling):
-        for i in range(featureSize):
-            std = np.std(X_copy[:, i])
-            for j in range(sampleSize):
-                X_copy[j][i] = X_copy[j][i] / std
+        for col in range(featureSize):
+            std = np.std(X_copy[:, col], ddof=1)
+            for row in range(sampleSize):
+                X_copy[row][col] = X_copy[row][col] / std
     return X_copy
 
 
@@ -26,6 +26,10 @@ def compute_covariance_matrix(Z):
 
 def find_pcs(COV):
     eigenValues, eigenVectors = LA.eig(COV)
+
+    eigenValues = eigenValues.real
+    eigenVectors = eigenVectors.real
+
     idx = eigenValues.argsort()[::-1]
     eigenValues = eigenValues[idx]
     eigenVectors = eigenVectors[:, idx]
@@ -43,11 +47,4 @@ def project_data(Z, PCS, L, k, var):
             if((numer/sum) >= var):
                 necc_EVs = i
                 break
-
-    # print(np.transpose(Z))
-    # print(Z)
-    # print(PCS)
-    # print(PCS[0:necc_EVs, :])
-    # print(PCS)
-    return np.matmul(Z, np.transpose(PCS[0:necc_EVs, :]))
-    # return 'peanutes'
+    return np.matmul(Z, PCS[:, 0:necc_EVs])
